@@ -27,8 +27,6 @@ class BotStates(StatesGroup):
   waiting_for_search_query = State()
 
 
-# --- Функция поиска и скачивания музыки через YouTube ---
-# --- Функция поиска и скачивания музыки через YouTube ---
 def download_audio_from_web(query: str):
   print(f"🔍 Ищем в интернете: '{query}'...")
   ydl_opts = {
@@ -37,17 +35,18 @@ def download_audio_from_web(query: str):
       "quiet": True,
       "no_warnings": True,
       "noplaylist": True,
+      # Используем клиент Android, чтобы YouTube не требовал вход в аккаунт
+      "extractor_args": {"youtube": {"player_client": ["android", "web"]}},
       "http_headers": {
           "User-Agent": (
-              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-              " (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+              "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML,"
+              " like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
           )
       },
   }
 
   try:
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-      # Ищем первый подходящий ролик по запросу
       search_results = ydl.extract_info(f"ytsearch1:{query}", download=True)
       if "entries" in search_results:
         video_info = search_results["entries"][0]
@@ -57,7 +56,6 @@ def download_audio_from_web(query: str):
       video_id = video_info["id"]
       title = video_info.get("title", query)
 
-      # Находим путь к скачанному файлу в папке downloads
       file_path = None
       for file in os.listdir("downloads"):
         if file.startswith(video_id):
@@ -68,9 +66,6 @@ def download_audio_from_web(query: str):
   except Exception as e:
     print(f"❌ Ошибка скачивания: {e}")
     return None, None
-
-
-
 
 # --- Меню и интерфейс бота ---
 def get_main_menu_keyboard():
