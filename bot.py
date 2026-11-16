@@ -28,15 +28,15 @@ class BotStates(StatesGroup):
 
 
 # --- Функция поиска и скачивания музыки через YouTube ---
+# --- Функция поиска и скачивания музыки через YouTube ---
 def download_audio_from_web(query: str):
   print(f"🔍 Ищем в интернете: '{query}'...")
   ydl_opts = {
-      "format": "bestaudio",  дл
+      "format": "bestaudio",
       "outtmpl": "downloads/%(id)s.%(ext)s",
       "quiet": True,
       "no_warnings": True,
       "noplaylist": True,
-      # Добавляем стандартные заголовки, чтобы YouTube не банил запросы с сервера
       "http_headers": {
           "User-Agent": (
               "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
@@ -57,7 +57,7 @@ def download_audio_from_web(query: str):
       video_id = video_info["id"]
       title = video_info.get("title", query)
 
-      # Находим путь к скачанному файлу в папке downloads (любое расширение)
+      # Находим путь к скачанному файлу в папке downloads
       file_path = None
       for file in os.listdir("downloads"):
         if file.startswith(video_id):
@@ -68,6 +68,7 @@ def download_audio_from_web(query: str):
   except Exception as e:
     print(f"❌ Ошибка скачивания: {e}")
     return None, None
+
 
 
 
