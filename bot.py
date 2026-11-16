@@ -27,6 +27,7 @@ class BotStates(StatesGroup):
   waiting_for_search_query = State()
 
 
+# --- Функция поиска и скачивания музыки через YouTube ---
 def download_audio_from_web(query: str):
   print(f"🔍 Ищем в интернете: '{query}'...")
   ydl_opts = {
@@ -35,12 +36,11 @@ def download_audio_from_web(query: str):
       "quiet": True,
       "no_warnings": True,
       "noplaylist": True,
-      # Используем клиент Android, чтобы YouTube не требовал вход в аккаунт
       "extractor_args": {"youtube": {"player_client": ["android", "web"]}},
       "http_headers": {
           "User-Agent": (
-              "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML,"
-              " like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
+              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+              " (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
           )
       },
   }
@@ -48,11 +48,14 @@ def download_audio_from_web(query: str):
   try:
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
       search_results = ydl.extract_info(f"ytsearch1:{query}", download=True)
-      if "entries" in search_results:
-        video_info = search_results["entries"][0]
-      else:
-        video_info = search_results
+      
+      # Безопасно извлекаем результаты
+      entries = search_results.get("entries") if isinstance(search_results, dict) else None
+      if not entries:
+        print("❌ Ничего не найдено по этому запросу.")
+        return None, None
 
+      video_info = entries[0]
       video_id = video_info["id"]
       title = video_info.get("title", query)
 
